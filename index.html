@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LoveCinema | فیلم دونفره</title>
+  <title>Movie Date | فیلم دونفره</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -15,19 +15,12 @@
 
   <section id="splash" class="splash">
     <div class="brand-mark">❤</div>
-    <h1>LoveCinema</h1>
-    <p>امشب فقط من و تو و یه فیلم خفن 🎬</p>
+    <p>شروع یه شب سینمایی دونفره 🎬</p>
   </section>
 
   <div id="app" class="app hidden">
     <header class="topbar glass">
-      <div>
-        <div class="brand">
-          <span class="brand-mark">❤</span>
-          <strong>LoveCinema</strong>
-        </div>
-        <p class="subtitle">پلن دو نفره‌ی شبانه‌ی ما</p>
-      </div>
+      <div class="brand"><span class="brand-mark">❤</span></div>
       <div class="topbar-actions">
         <button id="themeToggle" class="btn btn--ghost">Dark / Light</button>
       </div>
@@ -60,10 +53,11 @@
 
       <section class="section">
         <div class="section-head">
-          <h3>کالکشن واقعی فیلم‌ها</h3>
-          <span class="hint">پوسترها از منابع مختلف</span>
+          <h3>کالکشن فیلم‌ها (هر بار 10 تا)</h3>
+          <span class="hint">اسکرول کن، بی‌نهایت لود میشه</span>
         </div>
         <div id="movieGrid" class="grid"></div>
+        <div id="listSentinel" class="sentinel">در حال بارگذاری...</div>
       </section>
 
       <section class="section">
@@ -86,9 +80,20 @@
       <section class="section">
         <div class="section-head">
           <h3>لینک‌های پخش و اطلاعات</h3>
-          <span class="hint">تست شده</span>
+          <span class="hint">بررسی شده</span>
         </div>
         <div id="linkPanel" class="links glass"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h3>دسترسی DigiMoviez</h3>
+          <span class="hint">برای امنیت، ورود دستی</span>
+        </div>
+        <div class="links glass">
+          <a class="link-btn" href="https://digimoviez.com" target="_blank" rel="noreferrer">ورود به DigiMoviez</a>
+          <a class="link-btn" id="digimoviezSearchLink" href="https://digimoviez.com" target="_blank" rel="noreferrer">جستجوی عنوان انتخاب‌شده</a>
+        </div>
       </section>
     </main>
   </div>

@@ -3,60 +3,106 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Series Daily</title>
+  <title>دو نفره فیلم | عشق + سینما</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body>
-  <!-- پس‌زمینه سینمایی -->
+<body data-theme="night">
   <div class="bg"></div>
 
-  <!-- Splash -->
   <section id="splash" class="splash">
-    <div class="splash__logo">Series Daily</div>
-    <div class="splash__tag">Tonight’s lineup</div>
+    <div class="logo logo--splash">
+      <span class="logo__icon">❤︎</span>
+      <span>Movie Date</span>
+    </div>
+    <p class="splash__tag">امشب چی ببینیم عشق من؟ 🍿</p>
   </section>
 
-  <!-- App Shell -->
   <div id="app" class="app hidden">
-    <!-- Header -->
-    <header class="topbar">
-      <div>
-        <div class="topbar__hello">سلام 👋</div>
-        <div id="todayDate" class="topbar__date">—</div>
+    <header class="topbar glass">
+      <div class="topbar__left">
+        <div class="logo">
+          <span class="logo__icon">❤︎</span>
+          <span>Movie Date</span>
+        </div>
+        <div>
+          <div class="topbar__hello">سلام خوشگلا 👋</div>
+          <div id="todayDate" class="topbar__date">—</div>
+        </div>
       </div>
-      <button id="refreshBtn" class="btn btn--ghost">Sync</button>
+      <div class="topbar__actions">
+        <button id="themeToggle" class="btn btn--ghost">☀️/🌙</button>
+        <button id="refreshBtn" class="btn btn--ghost">Sync</button>
+      </div>
     </header>
 
-    <!-- Pages -->
     <main class="main">
-      <!-- TODAY -->
-      <section id="page-today" class="page page--active">
-        <div id="hero" class="hero">
+      <section id="page-home" class="page page--active">
+        <div id="hero" class="hero glass">
           <div class="hero__bg"></div>
           <div class="hero__content">
-            <div class="chip">Pick of the day</div>
+            <span class="chip">پیشنهاد امشب شما دو تا</span>
             <h1 id="heroTitle" class="hero__title">—</h1>
             <div id="heroMeta" class="hero__meta">—</div>
             <div class="hero__actions">
-              <button id="heroWatchBtn" class="btn">Watch</button>
-              <button id="heroTrailerBtn" class="btn btn--ghost">Trailer</button>
+              <button id="heroWatchBtn" class="btn">شروع تماشا</button>
+              <button id="heroTrailerBtn" class="btn btn--ghost">تریلر</button>
             </div>
           </div>
         </div>
 
         <div class="section">
           <div class="section__head">
-            <h2>Today Releases</h2>
-            <button class="link" data-action="seeAllToday">مشاهده همه</button>
+            <h2>سرویس‌ها</h2>
+            <span class="hint">ورود دستی امن</span>
           </div>
-          <div id="todayList" class="row row--grid"></div>
+          <div class="services">
+            <a class="serviceCard" href="https://www.netflix.com" target="_blank" rel="noreferrer">Netflix</a>
+            <a class="serviceCard" href="https://www.youtube.com" target="_blank" rel="noreferrer">YouTube</a>
+            <a class="serviceCard" href="https://digimoviez.com" target="_blank" rel="noreferrer">DigiMoviez</a>
+          </div>
         </div>
 
         <div class="section">
           <div class="section__head">
-            <h2>Trailers (YouTube)</h2>
+            <h2>پیدا کن چی ببینیم</h2>
+          </div>
+          <div class="searchBox glass">
+            <input id="globalSearch" class="input" placeholder="اسم فیلم/سریال رو بنویس عشقم..." />
+            <button id="clearSearchBtn" class="btn btn--ghost">پاکسازی</button>
+          </div>
+          <div id="todayList" class="row row--grid"></div>
+        </div>
+      </section>
+
+      <section id="page-watched" class="page">
+        <div class="section">
+          <div class="section__head">
+            <h2>دیده‌شده‌هامون 💞</h2>
+            <span class="hint">با زمان ثبت</span>
+          </div>
+          <div id="watchedList" class="row row--grid"></div>
+        </div>
+      </section>
+
+      <section id="page-watchlist" class="page">
+        <div class="section">
+          <div class="section__head">
+            <h2>لیست بعدی‌مون</h2>
+            <span class="hint">محلی</span>
+          </div>
+          <div id="watchlistList" class="row row--grid"></div>
+        </div>
+      </section>
+
+      <section id="page-trailers" class="page">
+        <div class="section">
+          <div class="section__head">
+            <h2>تریلر یوتیوب</h2>
             <div class="mini">
-              <input id="trailerQuery" class="input" placeholder="مثلاً: Severance trailer" />
+              <input id="trailerQuery" class="input" placeholder="مثلا: Interstellar trailer" />
               <button id="trailerSearchBtn" class="btn btn--ghost">Search</button>
             </div>
           </div>
@@ -64,47 +110,9 @@
         </div>
       </section>
 
-      <!-- CALENDAR -->
-      <section id="page-calendar" class="page">
-        <div class="section">
-          <div class="section__head">
-            <h2>Calendar</h2>
-            <span class="hint">به‌زودی</span>
-          </div>
-          <div class="card card--plain">
-            <p>اینجا تقویم انتشار رو می‌ذاریم (هفته/روز + لیست). تو مرحله بعدی می‌سازیم.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- WATCHLIST -->
-      <section id="page-watchlist" class="page">
-        <div class="section">
-          <div class="section__head">
-            <h2>Watchlist</h2>
-            <span class="hint">محلی (Local)</span>
-          </div>
-          <div id="watchlistList" class="row row--grid"></div>
-        </div>
-      </section>
-
-      <!-- EXPLORE -->
-      <section id="page-explore" class="page">
-        <div class="section">
-          <div class="section__head">
-            <h2>Explore</h2>
-            <span class="hint">به‌زودی</span>
-          </div>
-          <div class="card card--plain">
-            <p>اینجا سرچ و فیلترها رو می‌ذاریم. فعلاً از بخش YouTube سرچ داری.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- DETAILS MODAL -->
       <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
         <div class="modal__backdrop" data-action="closeModal"></div>
-        <div class="modal__sheet">
+        <div class="modal__sheet glass">
           <div class="modal__top">
             <div class="modal__title" id="modalTitle">—</div>
             <button class="btn btn--ghost" data-action="closeModal">بستن</button>
@@ -114,12 +122,11 @@
       </div>
     </main>
 
-    <!-- Bottom Nav -->
-    <nav class="bottomnav">
-      <button class="tab tab--active" data-page="today">Today</button>
-      <button class="tab" data-page="calendar">Calendar</button>
+    <nav class="bottomnav glass">
+      <button class="tab tab--active" data-page="home">خانه</button>
+      <button class="tab" data-page="watched">دیده شده</button>
       <button class="tab" data-page="watchlist">Watchlist</button>
-      <button class="tab" data-page="explore">Explore</button>
+      <button class="tab" data-page="trailers">تریلر</button>
     </nav>
   </div>
 

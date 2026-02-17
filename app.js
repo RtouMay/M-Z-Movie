@@ -1,103 +1,82 @@
-// ---------- Helpers ----------
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+const MOCK_TODAY = [
+  { id: "s1", title: "Severance", sub: "یه قسمت جدید برای دو نفره شبانه", poster: "https://picsum.photos/seed/sev/400/600", watchUrl: "https://www.youtube.com/results?search_query=Severance" },
+  { id: "s2", title: "The Bear", sub: "تند و پرهیجان", poster: "https://picsum.photos/seed/bear/400/600", watchUrl: "https://www.youtube.com/results?search_query=The+Bear" },
+  { id: "s3", title: "Interstellar", sub: "فضایی ولی عاشقونه", poster: "https://picsum.photos/seed/inter/400/600", watchUrl: "https://www.youtube.com/results?search_query=Interstellar" },
+  { id: "s4", title: "Arcane", sub: "انیمیشن خفن", poster: "https://picsum.photos/seed/arc/400/600", watchUrl: "https://www.youtube.com/results?search_query=Arcane+trailer" },
+  { id: "s5", title: "Mr. Robot", sub: "حس شبانه خاص", poster: "https://picsum.photos/seed/mr/400/600", watchUrl: "https://www.youtube.com/results?search_query=Mr+Robot" },
+  { id: "s6", title: "La La Land", sub: "موزیکال برای مود خوب", poster: "https://picsum.photos/seed/lala/400/600", watchUrl: "https://www.youtube.com/results?search_query=La+La+Land" },
+];
+
+const STORAGE = {
+  watchlist: "watchlist",
+  watched: "watched-list",
+  theme: "movie-date-theme",
+};
+
+function getLocal(key, fallback = []) {
+  try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+  catch { return fallback; }
+}
+function setLocal(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
 function formatFaDate(d = new Date()) {
-  try {
-    return new Intl.DateTimeFormat("fa-IR", { dateStyle: "full" }).format(d);
-  } catch {
-    return d.toDateString();
-  }
+  return new Intl.DateTimeFormat("fa-IR", { dateStyle: "full" }).format(d);
 }
-
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 function setActivePage(name) {
   $$(".page").forEach((p) => p.classList.remove("page--active"));
   $(`#page-${name}`).classList.add("page--active");
-
-  $$(".tab").forEach((t) => t.classList.remove("tab--active"));
+  $$(".tab").forEach((p) => p.classList.remove("tab--active"));
   $(`.tab[data-page="${name}"]`).classList.add("tab--active");
 }
 
-function openModal(title, html) {
-  $("#modalTitle").textContent = title;
-  $("#modalBody").innerHTML = html;
-  $("#modal").classList.remove("hidden");
-}
-function closeModal() {
-  $("#modal").classList.add("hidden");
-}
-
-// ---------- Mock data (فعلاً برای پر شدن UI) ----------
-const MOCK_TODAY = [
-  { id: "s1", title: "Severance", sub: "S02E05 • New Episode", poster: "https://picsum.photos/seed/sev/400/600", watchUrl: "https://www.youtube.com/results?search_query=Severance" },
-  { id: "s2", title: "The Bear", sub: "S03E01 • New Season", poster: "https://picsum.photos/seed/bear/400/600", watchUrl: "https://www.youtube.com/results?search_query=The+Bear" },
-  { id: "s3", title: "Dark", sub: "Rewatch pick", poster: "https://picsum.photos/seed/dark/400/600", watchUrl: "https://www.youtube.com/results?search_query=Dark+series" },
-  { id: "s4", title: "Arcane", sub: "Best animation", poster: "https://picsum.photos/seed/arc/400/600", watchUrl: "https://www.youtube.com/results?search_query=Arcane+trailer" },
-  { id: "s5", title: "Mr. Robot", sub: "Tonight vibe", poster: "https://picsum.photos/seed/mr/400/600", watchUrl: "https://www.youtube.com/results?search_query=Mr+Robot" },
-];
-
-function getWatchlist() {
-  try { return JSON.parse(localStorage.getItem("watchlist") || "[]"); }
-  catch { return []; }
-}
-function setWatchlist(list) {
-  localStorage.setItem("watchlist", JSON.stringify(list));
-}
-
-// ---------- Render ----------
 function cardHTML(item, type = "show") {
-  const safeTitle = escapeHtml(item.title);
-  const safeSub = escapeHtml(item.sub || "");
-  const poster = item.poster || "https://picsum.photos/seed/empty/400/600";
-  return `
-    <div class="card" data-type="${type}" data-id="${escapeHtml(item.id)}">
-      <img class="poster" src="${poster}" alt="${safeTitle}" loading="lazy" />
-      <div class="card__body">
-        <div class="card__title">${safeTitle}</div>
-        <div class="card__sub">${safeSub}</div>
-      </div>
+  return `<div class="card" data-type="${type}" data-id="${escapeHtml(item.id)}">
+    <img class="poster" src="${item.poster}" alt="${escapeHtml(item.title)}" loading="lazy" />
+    <div class="card__body">
+      <div class="card__title">${escapeHtml(item.title)}</div>
+      <div class="card__sub">${escapeHtml(item.sub || "")}</div>
     </div>
-  `;
+  </div>`;
 }
 
-function renderToday() {
-  // Hero
-  const pick = MOCK_TODAY[0];
+function renderToday(list = MOCK_TODAY) {
+  const pick = list[0] || MOCK_TODAY[0];
   $("#heroTitle").textContent = pick.title;
   $("#heroMeta").textContent = pick.sub;
-
   $("#heroWatchBtn").onclick = () => window.open(pick.watchUrl, "_blank");
   $("#heroTrailerBtn").onclick = async () => {
     $("#trailerQuery").value = `${pick.title} trailer`;
     await searchTrailers();
+    setActivePage("trailers");
   };
 
-  // List
-  $("#todayList").innerHTML = MOCK_TODAY.map((x) => cardHTML(x, "show")).join("");
+  $("#todayList").innerHTML = list.length
+    ? list.map((x) => cardHTML(x, "show")).join("")
+    : `<div class="card card--plain"><p>نتیجه‌ای برای این سرچ پیدا نشد 😅</p></div>`;
 }
 
 function renderWatchlist() {
-  const list = getWatchlist();
-  if (!list.length) {
-    $("#watchlistList").innerHTML = `
-      <div class="card card--plain">
-        <p>هیچی تو Watchlist نیست. از Today یا Trailers چیزی رو اضافه کن ✨</p>
-      </div>
-    `;
-    return;
-  }
-  $("#watchlistList").innerHTML = list.map((x) => cardHTML(x, "show")).join("");
+  const list = getLocal(STORAGE.watchlist);
+  $("#watchlistList").innerHTML = list.length
+    ? list.map((x) => cardHTML(x, "watchlist")).join("")
+    : `<div class="card card--plain"><p>فعلا چیزی اضافه نکردین، بزن بریم یه عنوان انتخاب کنیم ✨</p></div>`;
 }
 
-// ---------- YouTube search via Vercel API ----------
+function renderWatched() {
+  const list = getLocal(STORAGE.watched);
+  $("#watchedList").innerHTML = list.length
+    ? list.map((x) => cardHTML({ ...x, sub: `دیده شده در ${x.watchedAt}` }, "watched")).join("")
+    : `<div class="card card--plain"><p>هنوز چیزی به دیده‌شده‌ها اضافه نشده 💘</p></div>`;
+}
+
 async function searchTrailers() {
   const q = $("#trailerQuery").value.trim();
   if (!q) return;
-
   $("#trailerList").innerHTML = `<div class="card card--plain"><p>در حال جستجو…</p></div>`;
 
   try {
@@ -105,141 +84,135 @@ async function searchTrailers() {
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "YouTube error");
 
-    const items = (data.items || []).map((it) => {
-      const id = it.id?.videoId;
-      const title = it.snippet?.title || "Video";
-      const thumb = it.snippet?.thumbnails?.high?.url || it.snippet?.thumbnails?.default?.url;
-      return {
-        id: `yt_${id}`,
-        title,
-        sub: "YouTube",
-        poster: thumb,
-        watchUrl: `https://www.youtube.com/watch?v=${id}`,
-      };
-    });
+    const items = (data.items || []).map((it) => ({
+      id: `yt_${it.id?.videoId}`,
+      title: it.snippet?.title || "Video",
+      sub: "YouTube Trailer",
+      poster: it.snippet?.thumbnails?.high?.url || it.snippet?.thumbnails?.default?.url,
+      watchUrl: `https://www.youtube.com/watch?v=${it.id?.videoId}`,
+    }));
 
-    if (!items.length) {
-      $("#trailerList").innerHTML = `<div class="card card--plain"><p>نتیجه‌ای پیدا نشد.</p></div>`;
-      return;
-    }
-
-    $("#trailerList").innerHTML = items.map((x) => cardHTML(x, "video")).join("");
-  } catch (e) {
-    $("#trailerList").innerHTML = `<div class="card card--plain"><p>خطا در جستجو. دوباره امتحان کن.</p></div>`;
+    $("#trailerList").innerHTML = items.length
+      ? items.map((x) => cardHTML(x, "video")).join("")
+      : `<div class="card card--plain"><p>چیزی پیدا نشد 🥲</p></div>`;
+  } catch {
+    $("#trailerList").innerHTML = `<div class="card card--plain"><p>مشکلی پیش اومد، دوباره تست کن.</p></div>`;
   }
 }
 
-// ---------- Events ----------
-function wireNav() {
-  $$(".tab").forEach((btn) => {
-    btn.addEventListener("click", () => setActivePage(btn.dataset.page));
-  });
+function openModal(title, html) {
+  $("#modalTitle").textContent = title;
+  $("#modalBody").innerHTML = html;
+  $("#modal").classList.remove("hidden");
 }
+function closeModal() { $("#modal").classList.add("hidden"); }
 
-function wireModal() {
-  document.body.addEventListener("click", (e) => {
-    const t = e.target;
+function wireEvents() {
+  $$(".tab").forEach((btn) => btn.addEventListener("click", () => setActivePage(btn.dataset.page)));
 
-    // close modal
-    if (t?.dataset?.action === "closeModal") closeModal();
-
-    // card click
-    const card = t.closest?.(".card");
-    if (card) {
-      const id = card.dataset.id;
-      const type = card.dataset.type;
-
-      // find item in mock/watchlist doesn't matter, build actions
-      const all = [...MOCK_TODAY, ...getWatchlist()];
-      const found = all.find((x) => x.id === id) || { id, title: "Item", sub: "", poster: "", watchUrl: "" };
-
-      const inWL = getWatchlist().some((x) => x.id === found.id);
-
-      openModal(
-        found.title,
-        `
-          <div style="display:flex; gap:12px; align-items:flex-start;">
-            <img src="${found.poster}" style="width:92px; aspect-ratio:2/3; border-radius:14px; border:1px solid rgba(255,255,255,0.10);" />
-            <div style="flex:1">
-              <div style="color:rgba(255,255,255,0.85); font-weight:900;">${escapeHtml(found.sub || "")}</div>
-              <div style="margin-top:8px;">اکشن‌ها:</div>
-              <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-                <button class="btn" data-action="watchNow" data-id="${escapeHtml(found.id)}">Watch</button>
-                <button class="btn btn--ghost" data-action="toggleWL" data-id="${escapeHtml(found.id)}">
-                  ${inWL ? "Remove Watchlist" : "Add Watchlist"}
-                </button>
-              </div>
-            </div>
-          </div>
-        `
-      );
-    }
-
-    // modal actions
-    if (t?.dataset?.action === "watchNow") {
-      const id = t.dataset.id;
-      const all = [...MOCK_TODAY, ...getWatchlist()];
-      const found = all.find((x) => x.id === id);
-      if (found?.watchUrl) window.open(found.watchUrl, "_blank");
-    }
-
-    if (t?.dataset?.action === "toggleWL") {
-      const id = t.dataset.id;
-      const list = getWatchlist();
-      const all = [...MOCK_TODAY];
-      const found = all.find((x) => x.id === id) || list.find((x) => x.id === id);
-
-      if (!found) return;
-
-      const exists = list.some((x) => x.id === id);
-      const next = exists ? list.filter((x) => x.id !== id) : [found, ...list];
-      setWatchlist(next);
-      renderWatchlist();
-      closeModal();
-    }
-  });
-}
-
-function wireActions() {
-  $("#todayDate").textContent = formatFaDate(new Date());
+  $("#todayDate").textContent = formatFaDate();
   $("#refreshBtn").addEventListener("click", () => {
-    // فعلاً فقط رندر مجدد + یه حس سینمایی
-    $("#app").style.animation = "none";
-    // force reflow
-    void $("#app").offsetHeight;
-    $("#app").style.animation = "";
     renderToday();
     renderWatchlist();
+    renderWatched();
   });
 
   $("#trailerSearchBtn").addEventListener("click", searchTrailers);
-  $("#trailerQuery").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") searchTrailers();
+  $("#trailerQuery").addEventListener("keydown", (e) => e.key === "Enter" && searchTrailers());
+
+  $("#globalSearch").addEventListener("input", (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    const filtered = MOCK_TODAY.filter((x) => `${x.title} ${x.sub}`.toLowerCase().includes(q));
+    renderToday(filtered);
+  });
+
+  $("#clearSearchBtn").addEventListener("click", () => {
+    $("#globalSearch").value = "";
+    renderToday();
+  });
+
+  $("#themeToggle").addEventListener("click", () => {
+    const next = document.body.dataset.theme === "night" ? "day" : "night";
+    document.body.dataset.theme = next;
+    localStorage.setItem(STORAGE.theme, next);
+  });
+
+  document.body.addEventListener("click", (e) => {
+    const t = e.target;
+    if (t?.dataset?.action === "closeModal") closeModal();
+
+    const card = t.closest?.(".card");
+    if (!card) return;
+
+    const id = card.dataset.id;
+    const all = [...MOCK_TODAY, ...getLocal(STORAGE.watchlist), ...getLocal(STORAGE.watched)];
+    const found = all.find((x) => x.id === id);
+    if (!found) return;
+
+    const inWatchlist = getLocal(STORAGE.watchlist).some((x) => x.id === id);
+    openModal(found.title, `
+      <div style="display:flex; gap:10px; align-items:flex-start;">
+        <img src="${found.poster}" style="width:100px;border-radius:12px;aspect-ratio:2/3;object-fit:cover" />
+        <div>
+          <div style="color:var(--muted)">${escapeHtml(found.sub || "")}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn" data-action="watchNow" data-id="${escapeHtml(id)}">پخش</button>
+            <button class="btn btn--ghost" data-action="toggleWatchlist" data-id="${escapeHtml(id)}">${inWatchlist ? "حذف از لیست" : "افزودن به لیست"}</button>
+            <button class="btn btn--ghost" data-action="markWatched" data-id="${escapeHtml(id)}">ثبت به عنوان دیده‌شده</button>
+          </div>
+        </div>
+      </div>
+    `);
+  });
+
+  document.body.addEventListener("click", (e) => {
+    const action = e.target?.dataset?.action;
+    const id = e.target?.dataset?.id;
+    if (!action || !id) return;
+
+    const source = [...MOCK_TODAY, ...getLocal(STORAGE.watchlist), ...getLocal(STORAGE.watched)];
+    const item = source.find((x) => x.id === id);
+    if (!item) return;
+
+    if (action === "watchNow") window.open(item.watchUrl, "_blank");
+
+    if (action === "toggleWatchlist") {
+      const list = getLocal(STORAGE.watchlist);
+      const exists = list.some((x) => x.id === id);
+      const next = exists ? list.filter((x) => x.id !== id) : [item, ...list];
+      setLocal(STORAGE.watchlist, next);
+      renderWatchlist();
+      closeModal();
+    }
+
+    if (action === "markWatched") {
+      const watched = getLocal(STORAGE.watched);
+      const exists = watched.some((x) => x.id === id);
+      if (!exists) {
+        watched.unshift({ ...item, watchedAt: formatFaDate(new Date()) });
+        setLocal(STORAGE.watched, watched);
+      }
+      renderWatched();
+      closeModal();
+      setActivePage("watched");
+    }
   });
 }
 
-// ---------- Security helper ----------
 function escapeHtml(s) {
-  return String(s)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 }
 
-// ---------- Boot ----------
 async function boot() {
-  // splash for 900ms
-  await sleep(900);
+  const savedTheme = localStorage.getItem(STORAGE.theme);
+  if (savedTheme) document.body.dataset.theme = savedTheme;
+  await sleep(800);
   $("#splash").classList.add("hidden");
   $("#app").classList.remove("hidden");
-
-  wireNav();
-  wireModal();
-  wireActions();
-
+  wireEvents();
   renderToday();
   renderWatchlist();
+  renderWatched();
 }
+
 boot();
